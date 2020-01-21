@@ -18,9 +18,9 @@ const { mode, staticCompression }  = yargs.option('mode', {
 }).argv;
 const development = mode === 'development';
 
-const monacoEditorCorePath = development ? '/Users/hal/java/theia-dev/hello-world-ext/node_modules/@typefox/monaco-editor-core/dev/vs' : '/Users/hal/java/theia-dev/hello-world-ext/node_modules/@typefox/monaco-editor-core/min/vs';
-const monacoCssLanguagePath = '/Users/hal/java/theia-dev/hello-world-ext/node_modules/monaco-css/release/min';
-const monacoHtmlLanguagePath = '/Users/hal/java/theia-dev/hello-world-ext/node_modules/monaco-html/release/min';
+const monacoEditorCorePath = development ? '/workspace/theia-quiz-ext/node_modules/@typefox/monaco-editor-core/dev/vs' : '/workspace/theia-quiz-ext/node_modules/@typefox/monaco-editor-core/min/vs';
+const monacoCssLanguagePath = '/workspace/theia-quiz-ext/node_modules/monaco-css/release/min';
+const monacoHtmlLanguagePath = '/workspace/theia-quiz-ext/node_modules/monaco-html/release/min';
 
 const plugins = [new CopyWebpackPlugin([
     {

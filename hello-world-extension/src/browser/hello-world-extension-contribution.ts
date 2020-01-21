@@ -16,7 +16,7 @@ export class HelloWorldExtensionCommandContribution implements CommandContributi
 
     registerCommands(registry: CommandRegistry): void {
         registry.registerCommand(HelloWorldExtensionCommand, {
-            execute: () => this.messageService.info('Hello World!')
+            execute: () => this.messageService.info('Hello World!!!')
         });
     }
 }
