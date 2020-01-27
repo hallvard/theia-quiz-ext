@@ -4,10 +4,10 @@ const main = require('@theia/core/lib/node/main');
 BackendApplicationConfigProvider.set({});
 
 const serverModule = require('./server');
-const address = main.start(serverModule());
-address.then(function (address) {
+const serverAddress = main.start(serverModule());
+serverAddress.then(function ({ port, address }) {
     if (process && process.send) {
-        process.send(address.port.toString());
+        process.send({ port, address });
     }
 });
-module.exports = address;
+module.exports = serverAddress;

@@ -1,0 +1,44 @@
+{
+	"name": "quiz-ext",
+	"description": "Quiz in your IDE, for testing others skills than coding",
+	"version": "0.0.1",
+	"publisher": "no.hal.gitpod",
+	"engines": {
+		"vscode": "^1.38.0"
+	},
+	"categories": [
+		"Quiz"
+	],
+	"activationEvents": [
+		"onCommand:quiz.open",
+		"onWebviewPanel:quiz"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/hallvard/theia-quiz-ext.git"
+	},
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "quiz.open",
+				"title": "Answer Quiz",
+				"category": "Quiz"
+			}
+		]
+	},
+	"scripts": {
+        "prepare": "yarn run compile",
+		"vscode:prepublish": "yarn run compile",
+		"compile": "tsc -p ./",
+		"lint": "tslint -p ./",
+		"watch": "tsc -w -p ./"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@types/node": "^10.5.2",
+		"tslint": "^5.16.0",
+		"typescript": "^3.5.1",
+		"@types/vscode": "^1.38.0"
+	}
+}

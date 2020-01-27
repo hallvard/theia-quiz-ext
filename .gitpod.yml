@@ -4,7 +4,8 @@ tasks:
   - init: yarn
     command: |
       gp sync-done init
-      yarn --cwd {{extensionName}} watch
+      yarn --cwd plugins/quiz-ext watch
+    name: Watch quiz-ext
   - command: |
       gp sync-await init
       yarn --cwd browser-app watch
@@ -12,7 +13,7 @@ tasks:
     openMode: split-right
   - command: |
       gp sync-await init
-      yarn --cwd browser-app start ..
+      yarn --cwd browser-app start .. --hostname=0.0.0.0 # on all interfaces to get access to webviews
     name: Run browser-app
     openMode: tab-after
 ports:

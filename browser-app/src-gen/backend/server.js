@@ -39,9 +39,14 @@ module.exports = (port, host, argv) => Promise.resolve()
     .then(function () { return Promise.resolve(require('@theia/workspace/lib/node/workspace-backend-module')).then(load) })
     .then(function () { return Promise.resolve(require('@theia/process/lib/node/process-backend-module')).then(load) })
     .then(function () { return Promise.resolve(require('@theia/languages/lib/node/languages-backend-module')).then(load) })
-    .then(function () { return Promise.resolve(require('@theia/json/lib/node/json-backend-module')).then(load) })
     .then(function () { return Promise.resolve(require('@theia/terminal/lib/node/terminal-backend-module')).then(load) })
     .then(function () { return Promise.resolve(require('@theia/typescript/lib/node/typescript-backend-module')).then(load) })
+    .then(function () { return Promise.resolve(require('@theia/task/lib/node/task-backend-module')).then(load) })
+    .then(function () { return Promise.resolve(require('@theia/debug/lib/node/debug-backend-module')).then(load) })
+    .then(function () { return Promise.resolve(require('@theia/file-search/lib/node/file-search-backend-module')).then(load) })
+    .then(function () { return Promise.resolve(require('@theia/search-in-workspace/lib/node/search-in-workspace-backend-module')).then(load) })
+    .then(function () { return Promise.resolve(require('@theia/plugin-ext/lib/plugin-ext-backend-module')).then(load) })
+    .then(function () { return Promise.resolve(require('@theia/plugin-ext-vscode/lib/node/plugin-vscode-backend-module')).then(load) })
     .then(() => start(port, host, argv)).catch(reason => {
         console.error('Failed to start the backend application.');
         if (reason) {
