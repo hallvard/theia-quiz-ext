@@ -1,11 +1,18 @@
 {
 	"compilerOptions": {
-		"module": "commonjs",
+        "module": "commonjs",
 		"target": "es6",
 		"outDir": "out",
 		"sourceMap": true,
 		"strict": true,
-		"rootDir": "src"
+		"rootDir": "src",
+
+        "jsx": "react",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "lib": [
+            "dom", "es6"
+        ],
 	},
 	"exclude": ["node_modules", ".vscode-test"]
 }

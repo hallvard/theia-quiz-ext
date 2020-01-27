@@ -1,18 +1,21 @@
+import * as path from 'path';
 import * as vscode from 'vscode';
+import { update } from 'tar';
+
+const defaultQuizPanelState : QuizPanelState = { lastQuizPath: "/samples/test.quiz" };
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand('quiz.open', () => {
-			QuizPanel.createOrShow({ lastQuizPath: "/samples/test.quiz"});
-		})
+			QuizPanel.createOrShow(context, defaultQuizPanelState);
+        })
 	);
 
 	if (vscode.window.registerWebviewPanelSerializer) {
 		// Make sure we register a serializer in activation event
 		vscode.window.registerWebviewPanelSerializer(QuizPanel.viewType, {
 			async deserializeWebviewPanel(webviewPanel: vscode.WebviewPanel, state: any) {
-                console.log(`Got state: ${state}`);
-				QuizPanel.revive(webviewPanel, state as QuizPanelState);
+            	QuizPanel.currentPanel = new QuizPanel(webviewPanel, context, state || defaultQuizPanelState);
 			}
 		});
 	}
@@ -31,16 +34,18 @@ class QuizPanel {
 
 	public static readonly viewType = 'quiz';
 
+    private readonly _context: vscode.ExtensionContext
 	private readonly _panel: vscode.WebviewPanel;
-	private readonly _quizPath: string;
+	private _quizPath: string;
 	private _disposables: vscode.Disposable[] = [];
 
-	public static createOrShow(state: QuizPanelState) {
+	public static createOrShow(context: vscode.ExtensionContext, state: QuizPanelState) {
 		const column = vscode.window.activeTextEditor
 			? vscode.window.activeTextEditor.viewColumn
 			: undefined;
 		if (QuizPanel.currentPanel) {
-			QuizPanel.currentPanel._panel.reveal(column);
+            QuizPanel.currentPanel._panel.reveal(column);
+            QuizPanel.currentPanel.updateState(state);
 			return;
 		}
 
@@ -52,19 +57,12 @@ class QuizPanel {
 			}
 		);
 
-		QuizPanel.currentPanel = new QuizPanel(panel, state);
+		QuizPanel.currentPanel = new QuizPanel(panel, context, state);
 	}
 
-	public static revive(panel: vscode.WebviewPanel, state: QuizPanelState) {
-		QuizPanel.currentPanel = new QuizPanel(panel, state);
-	}
-
-	private constructor(panel: vscode.WebviewPanel, state: QuizPanelState) {
-		this._panel = panel;
-		this._quizPath = state.lastQuizPath;
-
-		// Set the webview's initial html content
-		this._update();
+	public constructor(panel: vscode.WebviewPanel, context: vscode.ExtensionContext, state: QuizPanelState) {
+        this._context = context;
+        this._panel = panel;
 
 		// Listen for when the panel is disposed
 		// This happens when the user closes the panel or when the panel is closed programatically
@@ -90,7 +88,9 @@ class QuizPanel {
 			},
 			null,
 			this._disposables
-		);
+        );
+        this._quizPath = state.lastQuizPath;
+        this._update();
 	}
 
 	public dispose() {
@@ -107,43 +107,62 @@ class QuizPanel {
 		}
 	}
 
+    public updateState(state: QuizPanelState) {
+        this._quizPath = state.lastQuizPath;
+        this._update();
+    }
+
+    private readonly sampleQuiz: Quiz = {
+        title: "Gitpod test",
+        parts: [
+            {
+                title: "Part 1",
+                qas: [
+                    {
+                        question: {
+                            type: "text",
+                            lang: "markdown",
+                            src: "Isn't gitpod amazing?"
+                        } as TextQuestion,
+                        answer: {
+                            type: "boolean",
+                            value: undefined
+                        }
+                    }
+                ]
+            }
+        ]
+    };
+
 	private _update() {
         this._panel.title = this._quizPath
-        const webview = this._panel.webview;
-        webview.html = this._getHtmlForQuiz({
-            title: "Gitpod test",
-            parts: [
-                {
-                    title: "Part 1",
-                    qas: [
-                        {
-                            q: {
-                                type: "text",
-                                lang: "markdown",
-                                src: "Isn't gitpod amazing?"
-                            },
-                            a: {
-                                type: "boolean",
-                                value: undefined
-                            }
-                        }
-                    ]
-                }
-            ]
-        });
+        if (vscode.workspace.rootPath) {
+            const workspaceFileUri = vscode.Uri.file(path.join(vscode.workspace.rootPath, this._quizPath));
+            vscode.workspace.openTextDocument(workspaceFileUri).then((document) => {
+                const quiz: Quiz = JSON.parse(document.getText());
+                this._panel.webview.html = this._getHtmlForQuiz(quiz || this.sampleQuiz);                        
+            });
+        }
 	}
 
 	private _getHtmlForQuiz(quiz: any) {
 		return `<!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>${quiz.title}</title>
-            </head>
-            <body>
-                <h1>${quiz.title}</h1>
-            </body>
-            </html>`;
+<html>
+    <head>
+        <title>Game</title>
+        <meta charset="UTF-8"/>
+        <link rel="stylesheet" href="Quiz.css">
+        <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script src="../out/QuizComponent"></script>
+    </head>
+    <body>
+        <div id="quizElement"></div>
+        <script type="text/javascript">
+        var quiz = ${quiz};
+        ReactDOM.render(React.createElement(QuizComponent, quiz), document.getElementById('quizElement'));
+        </script>
+    </body>
+</html>`;
 	}
 }

@@ -9,19 +9,20 @@ interface QuizPart {
 }
 
 interface QA {
-    q: Q
+    question: Question
+    answer: Answer
 }
 
-interface Q {
+interface Question {
     type: string
 }
 
-interface TextQ extends Q {
+interface TextQuestion extends Question {
     lang: string
     src: string
 }
 
-interface A {
+interface Answer {
     type: string
-    value: any
+    value?: any
 }
