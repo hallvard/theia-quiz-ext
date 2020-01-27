@@ -25,6 +25,8 @@ function load(raw) {
 }
 
 function start() {
+    (window['theia'] = window['theia'] || {}).container = container;
+
     const themeService = ThemeService.get();
     themeService.loadUserTheme();
 
@@ -48,7 +50,6 @@ module.exports = Promise.resolve()
     .then(function () { return import('@theia/markers/lib/browser/problem/problem-frontend-module').then(load) })
     .then(function () { return import('@theia/outline-view/lib/browser/outline-view-frontend-module').then(load) })
     .then(function () { return import('@theia/monaco/lib/browser/monaco-browser-module').then(load) })
-    .then(function () { return import('@theia/json/lib/browser/json-frontend-module').then(load) })
     .then(function () { return import('@theia/userstorage/lib/browser/user-storage-frontend-module').then(load) })
     .then(function () { return import('@theia/preferences/lib/browser/preference-frontend-module').then(load) })
     .then(function () { return import('@theia/terminal/lib/browser/terminal-frontend-module').then(load) })
@@ -56,7 +57,14 @@ module.exports = Promise.resolve()
     .then(function () { return import('@theia/callhierarchy/lib/browser/callhierarchy-frontend-module').then(load) })
     .then(function () { return import('@theia/typescript/lib/browser/typescript-frontend-module').then(load) })
     .then(function () { return import('@theia/messages/lib/browser/messages-frontend-module').then(load) })
-    .then(function () { return import('hello-world-extension/lib/browser/hello-world-extension-frontend-module').then(load) })
+    .then(function () { return import('@theia/console/lib/browser/console-frontend-module').then(load) })
+    .then(function () { return import('@theia/task/lib/browser/task-frontend-module').then(load) })
+    .then(function () { return import('@theia/debug/lib/browser/debug-frontend-module').then(load) })
+    .then(function () { return import('@theia/file-search/lib/browser/file-search-frontend-module').then(load) })
+    .then(function () { return import('@theia/scm/lib/browser/scm-frontend-module').then(load) })
+    .then(function () { return import('@theia/search-in-workspace/lib/browser/search-in-workspace-frontend-module').then(load) })
+    .then(function () { return import('@theia/plugin-ext/lib/plugin-ext-frontend-module').then(load) })
+    .then(function () { return import('@theia/plugin-ext-vscode/lib/browser/plugin-vscode-frontend-module').then(load) })
     .then(start).catch(reason => {
         console.error('Failed to start the frontend application.');
         if (reason) {
