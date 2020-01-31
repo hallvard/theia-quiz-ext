@@ -1,6 +1,7 @@
 import React, { FunctionComponent } from 'react';
-import QuestionComponent from './QuestionComponent';
-import AnswerComponent from './AnswerComponent';
+import { ContentsComponent } from './ContentsComponent';
+import { AnswerComponent } from './AnswerComponent';
+import { Quiz, QuizPart, QA } from './QuizModel'
 
 export const QuizComponent : FunctionComponent<Quiz> = (quiz) => <div className="quiz">
     <h2>{quiz.title}</h2>
@@ -9,7 +10,7 @@ export const QuizComponent : FunctionComponent<Quiz> = (quiz) => <div className=
             <h3>{part.title}</h3>
             {
                 part.qas.map((qa: QA) => <div className="qa">
-                    <QuestionComponent question={ qa.question }></QuestionComponent>
+                    <ContentsComponent question={ qa.question }></ContentsComponent>
                     <AnswerComponent answer={ qa.answer }></AnswerComponent>
                 </div>)
             }

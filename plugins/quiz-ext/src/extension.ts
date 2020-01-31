@@ -2,6 +2,8 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { update } from 'tar';
 
+import { Quiz } from './QuizModel'
+
 const defaultQuizPanelState : QuizPanelState = { lastQuizPath: "/samples/test.quiz" };
 
 export function activate(context: vscode.ExtensionContext) {
@@ -112,26 +114,30 @@ class QuizPanel {
         this._update();
     }
 
-    private readonly sampleQuiz: Quiz = {
-        title: "Gitpod test",
-        parts: [
+    private sampleQuiz : Quiz = {
+      title: "My first quiz",
+      parts: [
+        {
+          title: "First part",
+          qas: [
             {
-                title: "Part 1",
-                qas: [
-                    {
-                        question: {
-                            type: "text",
-                            lang: "markdown",
-                            src: "Isn't gitpod amazing?"
-                        } as TextQuestion,
-                        answer: {
-                            type: "boolean",
-                            value: undefined
-                        }
-                    }
-                ]
+              question: [
+                  {
+                    kind: "text",
+                    src: "What is your name?"
+                  },
+                  {
+                    kind: "markdown",
+                    src: "Your *first* name, that is!"
+                  }
+                ],
+              answer: {
+                kind: "string"
+              }
             }
-        ]
+          ]
+        }
+      ]
     };
 
 	private _update() {
@@ -146,23 +152,45 @@ class QuizPanel {
 	}
 
 	private _getHtmlForQuiz(quiz: any) {
+		const manifest = require(path.join(this._context.extensionPath, 'build', 'asset-manifest.json'));
+		const mainScript = manifest['main.js'];
+		const mainStyle = manifest['main.css'];
+
+		const scriptPathOnDisk = vscode.Uri.file(path.join(this._context.extensionPath, 'build', mainScript));
+		const scriptUri = scriptPathOnDisk.with({ scheme: 'vscode-resource' });
+		const stylePathOnDisk = vscode.Uri.file(path.join(this._context.extensionPath, 'build', mainStyle));
+		const styleUri = stylePathOnDisk.with({ scheme: 'vscode-resource' });
+
+		// Use a nonce to whitelist which scripts can be run
+		const nonce = getNonce();
+
 		return `<!DOCTYPE html>
-<html>
-    <head>
-        <title>Game</title>
-        <meta charset="UTF-8"/>
-        <link rel="stylesheet" href="Quiz.css">
-        <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-        <script src="../out/QuizComponent"></script>
-    </head>
-    <body>
-        <div id="quizElement"></div>
-        <script type="text/javascript">
-        var quiz = ${quiz};
-        ReactDOM.render(React.createElement(QuizComponent, quiz), document.getElementById('quizElement'));
-        </script>
-    </body>
-</html>`;
-	}
+			<html lang="en">
+			<head>
+				<meta charset="utf-8">
+				<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+				<meta name="theme-color" content="#000000">
+				<title>React App</title>
+				<link rel="stylesheet" type="text/css" href="${styleUri}">
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
+				<base href="${vscode.Uri.file(path.join(this._context.extensionPath, 'build')).with({ scheme: 'vscode-resource' })}/">
+			</head>
+
+			<body>
+				<noscript>You need to enable JavaScript to run this app.</noscript>
+				<div id="root"></div>
+				
+				<script nonce="${nonce}" src="${scriptUri}"></script>
+			</body>
+			</html>`;
+    }
+}
+
+function getNonce() {
+    let text = "";
+    const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (let i = 0; i < 32; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
 }
