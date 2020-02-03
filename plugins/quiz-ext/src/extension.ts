@@ -59,7 +59,7 @@ class QuizPanel {
 			}
 		);
 
-		QuizPanel.currentPanel = new QuizPanel(panel, context, state);
+        QuizPanel.currentPanel = new QuizPanel(panel, context, state);
 	}
 
 	public constructor(panel: vscode.WebviewPanel, context: vscode.ExtensionContext, state: QuizPanelState) {
@@ -82,12 +82,12 @@ class QuizPanel {
 
 		// Handle messages from the webview
 		this._panel.webview.onDidReceiveMessage((message: any) => {
-				switch (message.command) {
-					case 'alert':
-						vscode.window.showErrorMessage(message.text);
-						return;
-				}
-			},
+                if ('model' in message) {
+                    console.info(JSON.stringify(message.model))
+//                    vscode.window.showInformationMessage((message.model as Quiz).title);
+                    return;
+                }
+            },
 			null,
 			this._disposables
         );
@@ -114,77 +114,47 @@ class QuizPanel {
         this._update();
     }
 
-    private sampleQuiz : Quiz = {
-      title: "My first quiz",
-      parts: [
-        {
-          title: "First part",
-          qas: [
-            {
-              question: [
-                  {
-                    kind: "text",
-                    src: "What is your name?"
-                  },
-                  {
-                    kind: "markdown",
-                    src: "Your *first* name, that is!"
-                  }
-                ],
-              answer: {
-                kind: "string"
-              }
-            }
-          ]
-        }
-      ]
-    };
-
 	private _update() {
         this._panel.title = this._quizPath
         if (vscode.workspace.rootPath) {
             const workspaceFileUri = vscode.Uri.file(path.join(vscode.workspace.rootPath, this._quizPath));
             vscode.workspace.openTextDocument(workspaceFileUri).then((document) => {
                 const quiz: Quiz = JSON.parse(document.getText());
-                this._panel.webview.html = this._getHtmlForQuiz(quiz || this.sampleQuiz);                        
+                const html = this.getWebViewHtml(quiz);
+                console.info(html);
+                this._panel.webview.html = html;
+                this._panel.webview.postMessage({ model: quiz });
             });
         }
 	}
 
-    private getExtensionBuildUri(... segments : string[]) {
-		const pathOnDisk = vscode.Uri.file(path.join(this._context.extensionPath, 'out', ...segments));
+    private getExtensionUri(... segments : string[]) {
+		const pathOnDisk = vscode.Uri.file(path.join(this._context.extensionPath, 'dist', ...segments));
         const uri = pathOnDisk.with({ scheme: 'vscode-resource' });
-        return pathOnDisk;
+        return uri;
     }
 
-	private _getHtmlForQuiz(quiz: any) {
-//		const manifest = require(path.join(this._context.extensionPath, 'build', 'asset-manifest.json'));
-		const styleUri = this.getExtensionBuildUri('style.css'); // manifest['main.css']);
-		const scriptUri = this.getExtensionBuildUri('index.js'); // manifest['main.js'])
-		// Use a nonce to whitelist which scripts can be run
-		const nonce = getNonce();
-
-		return `<!DOCTYPE html>
+	private getWebViewHtml(quiz : Quiz) {
+        // path to webpack-ed index.tsx
+        const nonce = getNonce();
+		const scriptUri = this.getExtensionUri('main.js');
+        
+        return `<!DOCTYPE html>
 			<html lang="en">
 			<head>
 				<meta charset="utf-8">
 				<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
 				<meta name="theme-color" content="#000000">
-                <title>React App</title>
-                <!--
-                <link rel="stylesheet" type="text/css" href="${styleUri}">
-                -->
+                <title>Quiz/title>
 				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
-				<base href="${this.getExtensionBuildUri()}/">
+				<base href="${this.getExtensionUri()}/">
 			</head>
 
             <body>
-                <verbatim>${JSON.stringify(quiz)}</verbatim>
-                <p>${scriptUri}</p>
+                <h1>${quiz.title}</h1>
 				<noscript>You need to enable JavaScript to run this app.</noscript>
-				<div id="root"></div>
-				
-				<script nonce="${nonce}" src="${scriptUri}"></script>
+                <div id="root"></div>
+                <script nonce="${nonce}" src="${scriptUri}"></script>
 			</body>
 			</html>`;
     }

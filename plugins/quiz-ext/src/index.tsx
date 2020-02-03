@@ -1,9 +1,20 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import App from './App';
-import './index.css';
+import { Quiz } from './QuizModel';
+import { QuizComponent } from './QuizComponent';
 
-ReactDOM.render(
-  <App />,
-  document.getElementById('root') as HTMLElement
-);
+// declare var acquireVsCodeApi: any;
+// const vscode = acquireVsCodeApi();
+
+window.addEventListener('message', event => {
+    if ('model' in event.data) {
+        ReactDOM.render(
+            <div>
+                <p>Quiz</p>
+                <QuizComponent { ...event.data.model as Quiz }/>
+            </div>,
+            document.getElementById('root') as HTMLElement
+        );
+//        vscode.postMessage(message);
+    }
+});

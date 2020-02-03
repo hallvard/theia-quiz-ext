@@ -28,24 +28,29 @@
 		]
 	},
 	"scripts": {
-        "prepare": "yarn run compile",
+		"prepare": "yarn run compile",
 		"vscode:prepublish": "yarn run compile",
 		"compile": "tsc -p ./",
 		"lint": "tslint -p ./",
 		"watch": "tsc -w -p ./"
 	},
 	"dependencies": {
-        "commonmark": "latest"
-    },
+		"commonmark": "latest"
+	},
 	"devDependencies": {
+		"@types/commonmark": "latest",
 		"@types/node": "^10.5.2",
+		"@types/react": "^16.4.1",
+		"@types/react-dom": "^16.4.1",
+		"@types/vscode": "^1.38.0",
 		"tslint": "^5.16.0",
 		"typescript": "^3.5.1",
-		"@types/vscode": "^1.38.0",
-
-        "@types/react": "^16.4.1",
-        "@types/react-dom": "^16.4.1",
-
-        "@types/commonmark": "latest"
+    
+		"webpack": "^4.41.5",
+		"webpack-cli": "^3.3.10",
+        "ts-loader": "^6.2.1",
+        "source-map-loader":"^0.2.4",
+        "style-loader": "^1.1.3",
+        "css-loader": "^3.4.2" 
 	}
 }
