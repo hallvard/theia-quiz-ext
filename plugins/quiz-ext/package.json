@@ -34,7 +34,9 @@
 		"lint": "tslint -p ./",
 		"watch": "tsc -w -p ./"
 	},
-	"dependencies": {},
+	"dependencies": {
+        "commonmark": "latest"
+    },
 	"devDependencies": {
 		"@types/node": "^10.5.2",
 		"tslint": "^5.16.0",
@@ -42,6 +44,8 @@
 		"@types/vscode": "^1.38.0",
 
         "@types/react": "^16.4.1",
-        "@types/react-dom": "^16.4.1"
+        "@types/react-dom": "^16.4.1",
+
+        "@types/commonmark": "latest"
 	}
 }

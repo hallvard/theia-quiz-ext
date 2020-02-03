@@ -4,7 +4,7 @@ import { update } from 'tar';
 
 import { Quiz } from './QuizModel'
 
-const defaultQuizPanelState : QuizPanelState = { lastQuizPath: "/samples/test.quiz" };
+const defaultQuizPanelState : QuizPanelState = { lastQuizPath: "/quiz-samples/quiz1.json" };
 
 export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
@@ -151,16 +151,16 @@ class QuizPanel {
         }
 	}
 
+    private getExtensionBuildUri(... segments : string[]) {
+		const pathOnDisk = vscode.Uri.file(path.join(this._context.extensionPath, 'out', ...segments));
+        const uri = pathOnDisk.with({ scheme: 'vscode-resource' });
+        return pathOnDisk;
+    }
+
 	private _getHtmlForQuiz(quiz: any) {
-		const manifest = require(path.join(this._context.extensionPath, 'build', 'asset-manifest.json'));
-		const mainScript = manifest['main.js'];
-		const mainStyle = manifest['main.css'];
-
-		const scriptPathOnDisk = vscode.Uri.file(path.join(this._context.extensionPath, 'build', mainScript));
-		const scriptUri = scriptPathOnDisk.with({ scheme: 'vscode-resource' });
-		const stylePathOnDisk = vscode.Uri.file(path.join(this._context.extensionPath, 'build', mainStyle));
-		const styleUri = stylePathOnDisk.with({ scheme: 'vscode-resource' });
-
+//		const manifest = require(path.join(this._context.extensionPath, 'build', 'asset-manifest.json'));
+		const styleUri = this.getExtensionBuildUri('style.css'); // manifest['main.css']);
+		const scriptUri = this.getExtensionBuildUri('index.js'); // manifest['main.js'])
 		// Use a nonce to whitelist which scripts can be run
 		const nonce = getNonce();
 
@@ -170,13 +170,17 @@ class QuizPanel {
 				<meta charset="utf-8">
 				<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
 				<meta name="theme-color" content="#000000">
-				<title>React App</title>
-				<link rel="stylesheet" type="text/css" href="${styleUri}">
+                <title>React App</title>
+                <!--
+                <link rel="stylesheet" type="text/css" href="${styleUri}">
+                -->
 				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
-				<base href="${vscode.Uri.file(path.join(this._context.extensionPath, 'build')).with({ scheme: 'vscode-resource' })}/">
+				<base href="${this.getExtensionBuildUri()}/">
 			</head>
 
-			<body>
+            <body>
+                <verbatim>${JSON.stringify(quiz)}</verbatim>
+                <p>${scriptUri}</p>
 				<noscript>You need to enable JavaScript to run this app.</noscript>
 				<div id="root"></div>
 				

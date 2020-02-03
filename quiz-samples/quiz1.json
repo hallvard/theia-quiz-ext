@@ -1,0 +1,25 @@
+{
+      "title": "My first quiz",
+      "parts": [
+        {
+          "title": "First part",
+          "qas": [
+            {
+              "question": [
+                  {
+                    "kind": "text",
+                    "src": "What is your name?"
+                  },
+                  {
+                    "kind": "markdown",
+                    "src": "Your *first* name, that is!"
+                  }
+                ],
+              "answer": {
+                "kind": "string"
+              }
+            }
+          ]
+        }
+      ]
+    }
