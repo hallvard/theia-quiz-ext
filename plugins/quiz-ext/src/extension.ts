@@ -75,22 +75,20 @@ class QuizPanel {
 				if (this._panel.visible) {
 					this._update();
 				}
-			},
-			null,
-			this._disposables
+			}, null, this._disposables
 		);
 
 		// Handle messages from the webview
 		this._panel.webview.onDidReceiveMessage((message: any) => {
                 if ('model' in message) {
-                    console.info(JSON.stringify(message.model))
-//                    vscode.window.showInformationMessage((message.model as Quiz).title);
+                    console.info("WebView model updated: " + JSON.stringify(message.model))
                     return;
                 }
-            },
-			null,
-			this._disposables
+            }, null, this._disposables
         );
+        const html = this.getWebViewHtml();
+//        console.info(html);
+        this._panel.webview.html = html;
         this._quizPath = state.lastQuizPath;
         this._update();
 	}
@@ -120,9 +118,7 @@ class QuizPanel {
             const workspaceFileUri = vscode.Uri.file(path.join(vscode.workspace.rootPath, this._quizPath));
             vscode.workspace.openTextDocument(workspaceFileUri).then((document) => {
                 const quiz: Quiz = JSON.parse(document.getText());
-                const html = this.getWebViewHtml(quiz);
-                console.info(html);
-                this._panel.webview.html = html;
+                console.info("Updating WebView model: " + JSON.stringify(quiz));
                 this._panel.webview.postMessage({ model: quiz });
             });
         }
@@ -134,28 +130,26 @@ class QuizPanel {
         return uri;
     }
 
-	private getWebViewHtml(quiz : Quiz) {
+	private getWebViewHtml() {
         // path to webpack-ed index.tsx
         const nonce = getNonce();
 		const scriptUri = this.getExtensionUri('main.js');
         
         return `<!DOCTYPE html>
 			<html lang="en">
-			<head>
-				<meta charset="utf-8">
-				<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
-				<meta name="theme-color" content="#000000">
-                <title>Quiz/title>
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
-				<base href="${this.getExtensionUri()}/">
-			</head>
-
-            <body>
-                <h1>${quiz.title}</h1>
-				<noscript>You need to enable JavaScript to run this app.</noscript>
-                <div id="root"></div>
-                <script nonce="${nonce}" src="${scriptUri}"></script>
-			</body>
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+                    <meta name="theme-color" content="#000000">
+                    <title>Quiz</title>
+                    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src vscode-resource: https:; script-src 'nonce-${nonce}';style-src vscode-resource: 'unsafe-inline' http: https: data:;">
+                    <base href="${this.getExtensionUri()}/">
+                </head>
+                <body>
+                    <noscript>You need to enable JavaScript to run this app.</noscript>
+                    <div id="root"></div>
+                    <script nonce="${nonce}" src="${scriptUri}"></script>
+                </body>
 			</html>`;
     }
 }
