@@ -37,22 +37,23 @@ export interface Options extends Multiplicity {
     options: Content[]
 }    
 
-export type Answer = StringAnswer | BooleanAnswer | NumberAnswer
-    | OptionsAnswer;
+export type SimpleAnswer = StringAnswer | BooleanAnswer | NumberAnswer;
+
+export type Answer = SimpleAnswer | OptionsAnswer;
 
 interface AbstractAnswer<K extends string> extends AbstractContent<K> {
     id?: string
 }
 
-interface SimpleAnswer<T, K extends string> extends AbstractAnswer<K> {
+interface AbstractSimpleAnswer<T, K extends string> extends AbstractAnswer<K> {
     value?: T
 }
 
-export interface StringAnswer extends SimpleAnswer<string, "string"> {
+export interface StringAnswer extends AbstractSimpleAnswer<string, "string"> {
     regex?: string
 }
-export interface BooleanAnswer extends SimpleAnswer<Boolean, "boolean"> {}
-export interface NumberAnswer extends SimpleAnswer<Number, "number">, Multiplicity {}
+export interface BooleanAnswer extends AbstractSimpleAnswer<Boolean, "boolean"> {}
+export interface NumberAnswer extends AbstractSimpleAnswer<Number, "number">, Multiplicity {}
 
 export interface OptionsAnswer extends AbstractAnswer<"options"> {
     optionNums: number[]

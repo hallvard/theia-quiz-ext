@@ -12,41 +12,22 @@ const sample: Quiz = {
             "qas": [
                 {
                     "question": [
-                        {
-                            "kind": "text",
-                            "src": "What is your name?"
-                        },
-                        {
-                            "kind": "markdown",
-                            "src": "Your *first* name, that is!"
-                        }
+                        { "kind": "text", "src": "What is your name?"},
+                        { "kind": "markdown", "src": "Your *first* name, that is!" }
                     ],
-                    "answer": {
-                        "kind": "string"
-                    }
+                    "answer": { "kind": "string" }
                 },
                 {
                     "question": [
-                        {
-                            "kind": "text",
-                            "src": "Which of these is a prog.lang?"
-                        }
+                        { "kind": "text", "src": "Which of these is a prog.lang?" }
                     ],
                     "options": {
                         "options": [
-                            {
-                                "kind": "string",
-                                "value": "Canonball"
-                            },
-                            {
-                                "kind": "string",
-                                "value": "Snobol"
-                            },
-                            {
-                                "kind": "string",
-                                "value": "Bool"
-                            }
-                        ]
+                            { "kind": "string", "value": "Canonball" },
+                            { "kind": "string", "value": "Snobol" },
+                            { "kind": "string", "value": "Bool" }
+                        ],
+                        "upper": 1
                     },
                     "answer": {
                         "id": "q12",
